@@ -57,7 +57,6 @@ $('#login').click(function (){
   $.ajax("/UserManage/login/",{
     type: "POST",
     dataType: "json",
-    async:false,
     data: $('#login-form').serialize(),
       success: function (result) {
         if(result.state == 'not_exist_or_password_error'){

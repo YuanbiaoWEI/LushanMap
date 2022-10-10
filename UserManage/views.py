@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User,auth
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -18,7 +19,8 @@ def signup(request):
         if User.objects.filter(username=username):
             state = 'user_exist'
         else:
-            new_user = User.objects.create_user(username = username, password= password, email= request.POST.get('email',''))
+            userinfo = {'username':username,'password':password,'email':request.POST.get('email','')}
+            new_user = User.objects.create_user(**userinfo)
             new_user.save()
             state = 'success'
     response = {'state': state, 'User': None}
@@ -34,7 +36,7 @@ def login(request):
     print('user:',user)
     if user is not None:
         auth.login(request, user)
-        return HttpResponseRedirect(reverse('lushanmap'))
+        state = 'success'
     else:
         state = 'not_exist_or_password_error'
     response = {'state': state, 'User': None}
