@@ -1,0 +1,51 @@
+{% extends "Map/Map.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href={% static 'css/lushanmap.css' %}>
+ <div id="mapCon" class="mapCon"></div>
+ <script type="text/javascript">
+     /* 创建地图 */
+     var centerpoint = [116,29.6];
+     var lushanbound = [115.77,29.51,116.24,29.69];
+
+     var map = new ol.Map({
+         target: "mapCon",
+         view: new ol.View({
+             projection: 'EPSG:4326',
+             center: centerpoint,
+             zoom: 11,
+         }),
+     });
+
+     var Lushan= new ol.layer.Image({
+         name: "LuShanMap",
+         opacity: 0,
+         source: new ol.source.ImageWMS({
+             url: 'http://localhost:8080/geoserver/LuShan/wms',
+             params: {'FORMAT': "image/jpeg",
+                 'VERSION': '1.1.1',
+                 "LAYERS": 'LuShan:LuShanMap',
+                 "exceptions": 'application/vnd.ogc.se_inimage',
+             }
+         })
+     });
+
+     var TiandiMap_vec = new ol.layer.Tile ({
+         name: "天地图矢量图层",
+         source: new ol.source.XYZ ({
+             url: "http://t0.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=3bc6874f2b919aa581635abab7759a3f",
+             wrapX: false
+         })
+     });
+     var TiandiMap_cva = new ol.layer.Tile ({
+         name: "注记图层",
+         source: new ol.source.XYZ ({
+             url: "http://t0.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=3bc6874f2b919aa581635abab7759a3f",
+             wrapX: false
+         })
+     });
+     map.addLayer (TiandiMap_vec);
+     map.addLayer (Lushan);
+     map.addLayer (TiandiMap_cva);
+ </script>
+{% endblock %}

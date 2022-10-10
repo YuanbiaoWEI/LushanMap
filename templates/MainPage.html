@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>庐山综合服务系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href={% static 'css/base.css' %} />
+    
+    <!-- 开源库jquery -->
+    <script src={% static 'javascript/jquery-1.11.2.min.js' %}></script>
+    <!--  openlayers库 -->
+    <script src={% static 'javascript/ol.js' %}></script>
+    <link rel="stylesheet" href={% static 'css/ol.css' %}>
+    <!-- 自定义首页初始化JS -->
+    <script type="text/javascript" src={% static 'javascript/InitialPage.js' %}></script>
+    <link rel="icon" href={% static 'img/高山.ico' %}>
+</head>
+<body>
+    {% block main_content %}{% endblock %}
+</body>
+</html>

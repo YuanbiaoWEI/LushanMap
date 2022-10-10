@@ -1,0 +1,65 @@
+{% extends 'MainPage.html' %}
+{% load static %}
+{% block main_content %}
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.16.1/TweenMax.min.js' type="text/javascript"></script>
+    <link rel="stylesheet" href={% static 'css/login.css' %}>
+
+    <div id="login-button">
+      <img src="https://dqcgrsy5v35b9.cloudfront.net/cruiseplanner/assets/img/icons/login-w-icon.png">
+      </img>
+    </div>
+
+    <div id="container">
+      <h3>账户</h3>
+      <span class="close-btn">
+        <img src="https://cdn4.iconfinder.com/data/icons/miu/22/circle_close_delete_-128.png"></img>
+      </span>
+
+      <form id="login-form">
+        <input type="text" required id="login-username" name="username" placeholder="用户名">
+        <input type="password" required id="login-password" name="password" placeholder="密码">
+        <button id="login">登录</button>
+        <button id="signup">注册</button>
+        <div id="remember-container">
+          <input type="checkbox" id="checkbox-2-1" class="checkbox" checked="checked"/>
+          <span id="remember">记住我</span>
+          <span id="forgotten">忘记密码</span>
+        </div>
+    </form>
+    </div>
+
+    <!-- Forgotten Password Container -->
+    <div id="forgotten-container">
+       <h3>找回密码</h3>
+      <span class="close-btn">
+        <img src="https://cdn4.iconfinder.com/data/icons/miu/22/circle_close_delete_-128.png"></img>
+      </span>
+
+      <form>
+        <input type="email" name="email" placeholder="邮箱">
+        <button type="button" class="orange-btn">找回</button>
+    </form>
+    </div>
+
+    <!-- Sign up Container -->
+    <div id="signup-container">
+       <h3>注册</h3>
+      <span class="close-btn">
+        <img src="https://cdn4.iconfinder.com/data/icons/miu/22/circle_close_delete_-128.png"></img>
+      </span>
+
+      <form id="signup-form">
+          <input type="text" required id="signup-username" name="username" placeholder="用户名">
+          <input type="password" required id="signup-password" name="password" placeholder="密码">
+          <input type="password" required id="signup-rpassword" name="repeat_password" placeholder="重复密码">
+          <input type="email" required id="signup-email" name="email" placeholder="邮箱">
+          <button type="button" id="signup-button" class="orange-btn">注册</button>
+    </form>
+    </div>
+
+    <script src={% static 'javascript/login.js' %}></script>
+{% endblock %}
