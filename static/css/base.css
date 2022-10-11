@@ -81,6 +81,16 @@ a {
             font-size: 30%;
             border-left: groove 1px rgba(255,255,255,0.5);
         }
+
+        #header #userinfo{
+            display: block;
+            position: absolute;
+            margin-left:470px;
+            margin-top: 20px;
+            color: #fff;
+            font-size: 30%;
+            border-left: groove 1px rgba(255,255,255,0.5);
+        }
 /*=E 头部区域样式 */
 
 /*=S 主体框架 */

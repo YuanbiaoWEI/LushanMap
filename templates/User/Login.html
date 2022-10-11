@@ -19,7 +19,8 @@
         <img src="https://cdn4.iconfinder.com/data/icons/miu/22/circle_close_delete_-128.png"></img>
       </span>
 
-      <form id="login-form">
+      <form id="login-form" method="post" role="form">
+        {% csrf_token %}
         <input type="text" required id="login-username" name="username" placeholder="用户名">
         <input type="password" required id="login-password" name="password" placeholder="密码">
         <button id="login" type="button">登录</button>

@@ -62,9 +62,6 @@ $('#login').click(function (){
         if(result.state == 'not_exist_or_password_error'){
           alert("用户不存在或密码错误！");
         }
-        if(result.state == 'success'){
-          alert("success！");
-        }
       },
     error : function() {
       alert("服务器异常，有人要扣工资了！");

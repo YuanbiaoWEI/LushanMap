@@ -7,6 +7,9 @@
             <span id="name"> 庐山综合服务系统 </span>
         </a>
         <span id="time"></span>
+        {% if user %}
+        <span id="userinfo">欢迎您，{{ user.username }}！</span>
+        {% endif %}
 </div>
 <div id="content">
     <div class="leftsidebar_box">
