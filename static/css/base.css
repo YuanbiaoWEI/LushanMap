@@ -82,7 +82,7 @@ a {
             border-left: groove 1px rgba(255,255,255,0.5);
         }
 
-        #header #userinfo{
+        #header .userinfo{
             display: block;
             position: absolute;
             margin-left:470px;

@@ -12,10 +12,12 @@ def signup(request):
     state = None
     password = request.POST.get('password','')
     repeat_password = request.POST.get('repeat_password','')
-    if password != repeat_password:
+    username = request.POST.get('username', '')
+    if password == '' or repeat_password == '' or username == '':
+        state = 'empty'
+    elif password != repeat_password:
         state = 'repeat_error'
     else:
-        username = request.POST.get('username','')
         if User.objects.filter(username=username):
             state = 'user_exist'
         else:
@@ -32,10 +34,16 @@ def login(request):
     password = request.POST.get('password', '')
     username = request.POST.get('username', '')
     user = auth.authenticate(username=username,password=password)
+    print('user:',user)
     if user is not None:
         auth.login(request, user)
-        return HttpResponseRedirect('/lushanmap/')
+        state = 'success'
     else:
         state = 'not_exist_or_password_error'
     response = {'state': state, 'User': None}
     return JsonResponse(response)
+
+@csrf_exempt
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect('/')

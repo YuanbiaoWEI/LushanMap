@@ -7,8 +7,10 @@
             <span id="name"> 庐山综合服务系统 </span>
         </a>
         <span id="time"></span>
-        {% if user %}
-        <span id="userinfo">欢迎您，{{ user.username }}！</span>
+        {% if user.username != '' %}
+            <span class="userinfo">欢迎您&nbsp;{{ user.username }}&nbsp;&nbsp;<a href="/UserManage/logout/" style="cursor: pointer">[ 退出 ]</a></span>
+        {% else %}
+            <span class="userinfo">未登录，登录开启更多功能&nbsp;<a href="/" style="cursor: pointer">[ 登录 ]</a></span>
         {% endif %}
 </div>
 <div id="content">

@@ -37,7 +37,7 @@ $(function () {
 
 
 function refreshpage() {
-    location.reload(true);
+    $(location).attr('href','/');
 }
 
 function getTime(){

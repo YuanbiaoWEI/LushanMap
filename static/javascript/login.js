@@ -34,6 +34,9 @@ $('#signup-button').click(function (){
     dataType: "json",
     data: $('#signup-form').serialize(),
       success: function (result) {
+        if(result.state == 'empty'){
+          alert("用户名或密码不能为空！");
+        }
         if(result.state == 'repeat_error'){
           alert("重复密码错误！");
         }
@@ -61,6 +64,9 @@ $('#login').click(function (){
       success: function (result) {
         if(result.state == 'not_exist_or_password_error'){
           alert("用户不存在或密码错误！");
+        }
+        if(result.state == 'success'){
+          $(location).attr('href','/');
         }
       },
     error : function() {
