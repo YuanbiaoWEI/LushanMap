@@ -27,7 +27,7 @@ $(function () {
         //改变当前按钮的样式(选中状态)
         $(this).parent().parent().find('dl').find("dd").css("color", "");
         $(this).parent().parent().find('dl').find("dd").css("font-weight", "");
-        $(this).css("color", "#63b400");
+        $(this).css("color", "#1a5a61");
         $(this).css("font-weight", "bold");
     });
     

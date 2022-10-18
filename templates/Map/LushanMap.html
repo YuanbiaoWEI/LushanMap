@@ -2,29 +2,56 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href={% static 'css/lushanmap.css' %}>
- <div id="mapCon" class="mapCon"></div>
+ <div id="mapCon" class="mapCon">
+    {%  block function_html %}{% endblock %}
+    <div id="coordinates" style="z-index: 2;">
+            <label>经纬度：</label>
+        </div>
+        <div id="north" style="z-index: 2;">
+            <img src={% static 'img/north.png' %} style="z-index: 2;"></img>
+        </div>
+ </div>
  <script type="text/javascript">
      /* 创建地图 */
-     var centerpoint = [116,29.6];
-     var lushanbound = [115.77,29.51,116.24,29.69];
+     var centerpoint = [12912725.9,3445265.6];
+     var lushanbound = [12897211,3437389,12922494,3455421];
 
      var map = new ol.Map({
          target: "mapCon",
          view: new ol.View({
-             projection: 'EPSG:4326',
+             projection: 'EPSG:3857',
              center: centerpoint,
-             zoom: 11,
+             zoom: 12,
+             minZoom: 5,
+             maxZoom:18,
          }),
+         controls:
+            ol.control.defaults({
+                attributionOptions: ({
+                    collapsible: true
+                })
+              }).extend([
+                  new ol.control.ZoomToExtent({
+                      extent: lushanbound
+                  }),
+                new ol.control.MousePosition({
+                    coordinateFormat: ol.coordinate.createStringXY(5),
+                    projection:'EPSG:4326',
+                    placeholder: true,
+                    target:"coordinates"
+                }),
+                ])
      });
 
      var Lushan= new ol.layer.Image({
          name: "LuShanMap",
          opacity: 0,
+         maxZoom: 11,
          source: new ol.source.ImageWMS({
              url: 'http://localhost:8080/geoserver/LuShan/wms',
              params: {'FORMAT': "image/jpeg",
                  'VERSION': '1.1.1',
-                 "LAYERS": 'LuShan:LuShanMap',
+                 "LAYERS": 'LuShan:庐山DEM3857',
                  "exceptions": 'application/vnd.ogc.se_inimage',
              }
          })
@@ -47,5 +74,12 @@
      map.addLayer (TiandiMap_vec);
      map.addLayer (Lushan);
      map.addLayer (TiandiMap_cva);
+
+     //实例化ZoomSlider控件并加载到地图容器中
+    var zoomslider = new ol.control.ZoomSlider();
+    map.addControl(zoomslider);
+    map.addControl(new ol.control.ScaleLine())
  </script>
+
+    {%  block function_js %}{% endblock %}
 {% endblock %}

@@ -1,0 +1,200 @@
+{% extends "Map/LushanMap.html" %}
+{% load static %}
+
+{%  block function_html %}
+    <link rel="stylesheet" href={% static 'css/QueryByBound.css' %}>
+    <div id="menu" style="z-index: 2;">
+            <select id="type">
+                <option disabled selected value>- 请选择绘制形状</option>
+                <option value="None">无绘制</option>
+                <option value="Clear">清除图形</option>
+                <option value="Polygon">绘多边形</option>
+                <option value="Square">绘正方形</option>
+                <option value="Circle">绘圆形</option>
+                <option value="Box">绘长方形</option>
+            </select>
+            <button id="querybutton" onclick="Query()">搜索</button>
+            <button id="clearbutton" onclick="ClearQuery()">清除结果</button>
+        </div>
+{% endblock %}
+
+{%  block function_js %}
+    <script>
+        //绘制类型对象 2022.8.4
+        var typeSelect = document.getElementById('type');
+        //绘制对象
+        var draw;
+        //实例化一个矢量图层Vector作为绘制层
+        var sourceOfDrawingObject = null;
+        var vectorOfDrawingObject = new ol.layer.Vector({
+            source: sourceOfDrawingObject,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#00a5b4',
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 7,
+                    fill: new ol.style.Fill({
+                        color: '#00a5b4'
+                    })
+                })
+            })
+        });
+        //将绘制层添加到地图容器中
+        map.addLayer(vectorOfDrawingObject);
+        //搜索结果的图层和要素
+        var vectorfeature =null;
+        var vectorlayer =null;
+        //根据绘制类型进行交互绘制图形处理
+        function addInteraction() {
+            //绘制类型
+            var value = typeSelect.value;
+            if (value !== 'Clear' && value !== 'None') {
+                if (sourceOfDrawingObject == null) {
+                    sourceOfDrawingObject = new ol.source.Vector({ wrapX: false });
+                    //添加绘制层数据源
+                    vectorOfDrawingObject.setSource(sourceOfDrawingObject);
+                }
+                var geometryFunction, maxPoints;
+                if (value === 'Square') {
+                    value = 'Circle';
+                    //正方形图形（圆）
+                    geometryFunction = ol.interaction.Draw.createRegularPolygon(4);
+
+                } else if (value === 'Box') {
+                    value = 'LineString';
+                    maxPoints = 2;
+                    geometryFunction = function (coordinates, geometry) {
+                        var start = coordinates[0];
+                        var end = coordinates[1];
+                        if (!geometry) {
+                            //多边形
+                            geometry = new ol.geom.Polygon([
+                                [start, [start[0], end[1]], end, [end[0], start[1]], start]
+                            ]);
+                        }
+                        geometry.setCoordinates([
+                            [start, [start[0], end[1]], end, [end[0], start[1]], start]
+                        ]);
+                        return geometry;
+                    };
+                }
+                //实例化交互绘制类对象并添加到地图容器中
+                draw = new ol.interaction.Draw({
+                    //绘制层数据源
+                    source: sourceOfDrawingObject,
+                    /** @type {ol.geom.GeometryType}几何图形类型 */
+                    type: value,
+                    //几何信息变更时调用函数
+                    geometryFunction: geometryFunction,
+                    //最大点数
+                    maxPoints: maxPoints
+                });
+                draw.on('drawend',function() {
+                    typeSelect.options[0].selected = true;
+                    map.removeInteraction(draw);
+                })
+                map.addInteraction(draw);
+            }
+            else if (value === 'Clear') {
+                sourceOfDrawingObject = null;
+                //清空绘制图形
+                vectorOfDrawingObject.setSource(sourceOfDrawingObject);
+                //清除搜索结果
+                ClearQuery();
+            }
+            else if (value === 'None'){
+                map.removeInteraction(draw);
+            }
+        }
+
+        //用户更改绘制类型触发的事件
+        typeSelect.onchange = function (e) {
+            //移除绘制交互
+            map.removeInteraction(draw);
+            //清空绘制图形
+            sourceOfDrawingObject = null;
+            vectorOfDrawingObject.setSource(sourceOfDrawingObject);
+            //清除搜索结果
+            ClearQuery();
+            //添加交互绘制功能控件
+            addInteraction();
+        };
+        //添加交互绘制功能控件
+        //addInteraction();
+
+        var resultfeature;
+        function Query(){
+            //停止绘制事件
+            typeSelect.options[0].selected = true;
+            map.removeInteraction(draw);
+
+            if(sourceOfDrawingObject === null)
+            {
+                alert("请先绘制搜索区域!");
+                return;
+            }
+            else{
+                var areageom = (new ol.format.GeoJSON()).writeGeometryObject(sourceOfDrawingObject.getFeatures()[0].getGeometry());
+                var areapolygon;
+                if(sourceOfDrawingObject.getFeatures()[0].getGeometry().getType() !== 'Circle'){
+                    areapolygon = new ol.geom.Polygon(areageom.coordinates);
+                }
+                else {
+                    areapolygon = new ol.geom.Polygon.fromCircle(sourceOfDrawingObject.getFeatures()[0].getGeometry());
+                }
+                var dataurl = "http://localhost:8090/iserver/services/data-ChengduFresh/rest/data";
+                var getFeatureParams = new SuperMap.GetFeaturesByGeometryParameters({
+                    datasetNames: ["ChengduFresh:Shop"],
+                    geometry: areapolygon,
+                    spatialQueryMode: "INTERSECT",
+                    toIndex:200
+                });
+            }
+            new ol.supermap.FeatureService(dataurl).getFeaturesByGeometry(getFeatureParams, function (serviceResult) {
+                if(serviceResult.result.features.features.length === 0){
+                    alert("抱歉！该区域内没有店铺...");
+                    ClearQuery();
+                    return;
+                }
+                vectorfeature = (new ol.format.GeoJSON()).readFeatures(serviceResult.result.features);
+                var vectorSource = new ol.source.Vector({
+                    features: vectorfeature,
+                    wrapX: false
+                });
+                vectorlayer = new ol.layer.Vector({
+                    name: "点矢量图层",
+                    source: vectorSource,
+                    style: new ol.style.Style({
+                        image: new ol.style.Icon(({
+                            anchor: [0.5, 0.9],
+                            src: '../img/locator/greenIcon.png'
+                        }))
+                    })
+                });
+                map.addLayer(vectorlayer);
+
+                //地图鼠标移动事件
+                map.on('pointermove',pointermoveListener);
+                //地图鼠标点击事件
+                map.on('click',clickListener);
+            });
+        }
+
+        function ClearQuery(){
+            map.removeLayer(vectorlayer);
+            vectorlayer = null;
+            vectorfeature = null;
+            //overlay.setPosition(undefined);
+            //map.removeOverlay(overlay);
+            //map.un("click",clickListener);
+            sourceOfDrawingObject = null;
+            //清空绘制图形
+            vectorOfDrawingObject.setSource(sourceOfDrawingObject);
+        }
+    </script>
+{% endblock %}

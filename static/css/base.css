@@ -107,7 +107,7 @@ a {
 
 /*=S 导航部分left */
 .leftsidebar_box {
-    min-width: 220px;
+    width: 220px;
     height: 100% !important;
     overflow-y: scroll;
     position: absolute;
@@ -222,10 +222,11 @@ a {
     height: 100%;
     border: none;
     z-index: 1;
-    margin-left: 690px;
+    left: 220px;
     position: relative;
     top: 0;
     bottom: 0;
+    margin-left: 0 !important;
 }
 
 #container_iframe {

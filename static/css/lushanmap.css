@@ -35,3 +35,30 @@
 #mapCon .ol-zoom-extent {
     top: 280px;
 }
+
+#coordinates{
+    background: rgba(0, 129, 168, 0.53);
+    position: absolute;
+    top : 10px;
+    right : 230px;
+    width: 205px;
+    height: 35px;
+    border-radius: 5px 5px 5px 5px;
+    color: aliceblue;
+    font-family: "微软雅黑";
+}
+#coordinates label{
+    position: absolute;
+    margin-top: 7.5px;
+    margin-left: 6px;
+    color: aliceblue;
+    font-family: "微软雅黑";
+}
+
+#north img{
+    position: absolute;
+    top : 13px;
+    right : 440px;
+    width: 30px;
+    height: 30px;
+}

@@ -1,0 +1,15 @@
+{% extends "Map/LushanMap.html" %}
+{% load static %}
+
+{%  block function_html %}
+    <link rel="stylesheet" href={% static 'css/QueryByName.css' %}>
+    <div class="menu" style="z-index: 2;">
+            <input id="inputtext" type="text" name="shopname" value="" placeholder="请输入您要搜索的名称...">
+            <button id="querybutton" onclick="Query()">搜索</button>
+            <button id="clearbutton" onclick="ClearQuery()">清除结果</button>
+        </div>
+{% endblock %}
+
+{%  block function_js %}
+
+{% endblock %}

@@ -14,14 +14,15 @@
         {% endif %}
 </div>
 <div id="content">
+    {% if user.username != '' %}
     <div class="leftsidebar_box">
                 <dl class="homepage" onclick="refreshpage()">
                     系统首页
                 </dl>
                 <dl>
                     <dt class="first_dt">景点查询</dt>
-                    <dd onclick="setCore('QuerybyBound')">框选查询</dd>
-                    <dd onclick="setCore('QuerybyName')">景点名称查询</dd>
+                    <dd onclick='window.location.href="/QueryByBound"'>框选查询</dd>
+                    <dd onclick='window.location.href="/QueryByName"'>景点名称查询</dd>
                 </dl>
                 <dl>
                     <dt class="first_dt">路线导航</dt>
@@ -32,12 +33,38 @@
                     <dd onclick="setCore('ServiceArea')">景点服务范围</dd>
                     <dd onclick="setCore('HeatMap')">景点热力图</dd>
                 </dl>
-            </div>
+    </div>
+    {% else %}
+    <div class="leftsidebar_box">
+                <dl class="homepage" onclick="refreshpage()">
+                    系统首页
+                </dl>
+                <dl>
+                    <dt class="first_dt">景点查询</dt>
+                    <dd onclick="NoUserWarning()">框选查询</dd>
+                    <dd onclick="NoUserWarning()">景点名称查询</dd>
+                </dl>
+                <dl>
+                    <dt class="first_dt">路线导航</dt>
+                    <dd onclick="NoUserWarning()">绘制终点并显示导航路线</dd>
+                </dl>
+                <dl>
+                    <dt class="first_dt">景点分析</dt>
+                    <dd onclick="NoUserWarning()">景点服务范围</dd>
+                    <dd onclick="NoUserWarning()">景点热力图</dd>
+                </dl>
+    </div>
+        <script>
+            function NoUserWarning(){
+                alert("登录后开放此功能!");
+            }
+        </script>
+    {% endif %}
     <div class="iframe_wrapper">
                 <div id="container_iframe" name="container_iframe" scrolling="no">
                     {% block content %}{% endblock %}
                 </div>
-            </div>
+    </div>
     <div id="popup" class="ol-popup">
         <div id="popup-content"></div>
     </div>
