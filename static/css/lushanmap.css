@@ -62,3 +62,13 @@
     width: 30px;
     height: 30px;
 }
+
+#LayerRadio{
+    z-index: 3;
+    position: absolute;
+    bottom : 8px;
+    right : 230px;
+    width: auto;
+    height: auto;
+    background: rgba(255, 255, 255, 0.6);
+}

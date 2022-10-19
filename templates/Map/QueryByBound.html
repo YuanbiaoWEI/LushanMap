@@ -47,7 +47,7 @@
         //将绘制层添加到地图容器中
         map.addLayer(vectorOfDrawingObject);
         //搜索结果的图层和要素
-        var vectorfeature =null;
+        var vectorfeatures =null;
         var vectorlayer =null;
         //根据绘制类型进行交互绘制图形处理
         function addInteraction() {
@@ -147,6 +147,52 @@
                 else {
                     areapolygon = new ol.geom.Polygon.fromCircle(sourceOfDrawingObject.getFeatures()[0].getGeometry());
                 }
+
+                //console.log(JSON.stringify(BoundGeojson));
+
+                $.ajax("/GeoFunction/QueryByBound/",{
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify({'BoundGeojson':areapolygon.getCoordinates()}),
+                  success: function (result) {
+                    console.log(result)
+                      if(result['geometry']["coordinates"].length === 0){
+                            alert("抱歉！该区域内没有景点...");
+                            ClearQuery();
+                            return;
+                        }
+
+                      vectorfeatures = (new ol.format.GeoJSON()).readFeatures(result);
+                        var vectorSource = new ol.source.Vector({
+                            features: vectorfeatures,
+                            wrapX: false
+                        });
+                        console.log(vectorSource.getProjection())
+                        vectorlayer = new ol.layer.Vector({
+                            name: "景点查询结果",
+                            source: vectorSource,
+                            style: new ol.style.Style({
+                                    image: new ol.style.Circle({
+                                    radius: 5,//半径
+                                    fill: new ol.style.Fill({//填充样式
+                                    color: '#2459ff',
+                                    }),
+                                stroke: new ol.style.Stroke({//边界样式
+                                    color: '#555555',
+                                    width: 1
+                                    })
+                                })
+                            })
+                        });
+                        map.addLayer(vectorlayer);
+
+                  },
+                error : function() {
+                  alert("服务器异常，有人要扣工资了！");
+                }
+              });
+
+                /*
                 var dataurl = "http://localhost:8090/iserver/services/data-ChengduFresh/rest/data";
                 var getFeatureParams = new SuperMap.GetFeaturesByGeometryParameters({
                     datasetNames: ["ChengduFresh:Shop"],
@@ -178,17 +224,14 @@
                 });
                 map.addLayer(vectorlayer);
 
-                //地图鼠标移动事件
-                map.on('pointermove',pointermoveListener);
-                //地图鼠标点击事件
-                map.on('click',clickListener);
-            });
+                 */}
+            //});
         }
 
         function ClearQuery(){
             map.removeLayer(vectorlayer);
             vectorlayer = null;
-            vectorfeature = null;
+            vectorfeatures = null;
             //overlay.setPosition(undefined);
             //map.removeOverlay(overlay);
             //map.un("click",clickListener);

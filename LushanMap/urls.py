@@ -21,4 +21,5 @@ urlpatterns = [
     #添加项目应用的urls
     path('', include(('MainMap.urls', 'MainMap'))),
     path('UserManage/', include(('UserManage.urls', 'UserManage'))),
+    path('GeoFunction/', include(('GeoFunction.urls', 'GeoFunction'))),
 ]
