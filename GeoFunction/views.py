@@ -16,15 +16,45 @@ def querybybound(request):
     BoundGeojson = param["BoundGeojson"]
     SQL = models.SQLQueryByBound(BoundGeojson)
     response = models.execSQL(SQL)
-    featurejson = {
-        "type": "Feature",
-        "geometry": {
-            "type": "MultiPoint",
-            "coordinates": []
-        }
+    FeatureCollection = {
+        "type":"FeatureCollection",
+        "features":[]
     }
     for eachpoint in response:
-        coordin = [eachpoint['x'],eachpoint['y']]
-        featurejson['geometry']["coordinates"].append(coordin)
+        feature = {
+            "type": "Feature",
+            "properties": {
+                "name": eachpoint['name']
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [eachpoint['x'],eachpoint['y']]
+            }
+        }
+        FeatureCollection["features"].append(feature)
+    return JsonResponse(FeatureCollection)
 
-    return JsonResponse(featurejson)
+@csrf_exempt
+@login_required
+def querybyname(request):
+    param = json.loads(request.body.decode('utf-8'))
+    name = param["name"]
+    SQL = models.SQLQueryByName(name)
+    response = models.execSQL(SQL)
+    FeatureCollection = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+    for eachpoint in response:
+        feature = {
+            "type": "Feature",
+            "properties": {
+                "name": eachpoint['name']
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [eachpoint['x'], eachpoint['y']]
+            }
+        }
+        FeatureCollection["features"].append(feature)
+    return JsonResponse(FeatureCollection)

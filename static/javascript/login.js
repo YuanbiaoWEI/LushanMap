@@ -56,7 +56,16 @@ $('#signup-button').click(function (){
   });
 });
 
-$('#login').click(function (){
+$('#login-password').on("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        $('#login').click();
+    }
+});
+
+$('#login').click(login);
+
+function login(){
   $.ajax("/UserManage/login/",{
     type: "POST",
     dataType: "json",
@@ -73,4 +82,4 @@ $('#login').click(function (){
       alert("服务器异常，有人要扣工资了！");
     }
   });
-});
+}

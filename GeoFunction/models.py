@@ -23,3 +23,7 @@ def SQLQueryByBound(BoundGeoJson):
     #print("BoundGeoJson:",BoundGeoJson)
     SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point where ST_Contains( ST_Transform( ST_SetSRID( ST_GeomFromGeojson(\'{"type":"Polygon","coordinates":' + json.dumps(BoundGeoJson) + '}\'),3857), 4326), nature_point.geom) = true'
     return SQL
+
+def SQLQueryByName(name):
+    SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point where name like ' + name + ';'
+    return SQL

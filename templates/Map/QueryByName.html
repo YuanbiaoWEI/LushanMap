@@ -4,12 +4,118 @@
 {%  block function_html %}
     <link rel="stylesheet" href={% static 'css/QueryByName.css' %}>
     <div class="menu" style="z-index: 2;">
-            <input id="inputtext" type="text" name="shopname" value="" placeholder="请输入您要搜索的名称...">
+            <input id="inputtext" type="text" name="name" value="" placeholder="请输入您要搜索的名称...">
             <button id="querybutton" onclick="Query()">搜索</button>
             <button id="clearbutton" onclick="ClearQuery()">清除结果</button>
         </div>
 {% endblock %}
 
 {%  block function_js %}
+    <script>
+    $('#inputtext').on('keypress', Query);
 
+    var vectorlayer;
+    var labellayer;
+    function Query() {
+
+        //清楚原有搜索结果
+        map.removeLayer (vectorlayer);
+        vectorlayer = null;
+        map.removeLayer (labellayer);
+        labellayer = null;
+        //overlay.setPosition(undefined);
+        //map.removeOverlay(overlay);
+
+        //处理输入的字符
+        var inputtetx = $ ('#inputtext').val();
+        if (inputtetx === "") {
+            return;
+        }
+        var textarr = inputtetx.split ("");
+        var finalstring = "\'%";
+        for (i = 0; i < textarr.length; i++) {
+            finalstring = finalstring + textarr[i] + "%";
+        }
+        finalstring = finalstring + "\'";
+
+        //使用SQL查询
+        $.ajax ("/GeoFunction/QueryByName/", {
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify ({'name': finalstring}),
+            success: function (result) {
+                console.log (result)
+                if (result["features"].length === 0) {
+                    alert ("抱歉！没有找到景点...");
+                    ClearQuery ();
+                    return;
+                }
+                vectorfeatures = (new ol.format.GeoJSON()).readFeatures(result);
+                    var vectorSource = new ol.source.Vector({
+                        features: vectorfeatures,
+                        wrapX: false
+                    });
+                    console.log(vectorfeatures)
+                    vectorlayer = new ol.layer.Vector({
+                        name: "景点查询结果",
+                        source: vectorSource,
+                        style: new ol.style.Style({
+                            //图标样式
+                            image: new ol.style.Circle({
+                                radius: 5,//半径
+                                fill: new ol.style.Fill({//填充样式
+                                    color: '#33488c',
+                                    }),
+                                stroke: new ol.style.Stroke({//边界样式
+                                    color: '#ffffff',
+                                    width: 1
+                                    }),
+                            }),
+                        })
+                    });
+                    map.addLayer(vectorlayer);
+
+                    var labelsource = new ol.source.Vector();
+                    for(i=0; i<result["features"].length;i++){
+                        let tmpfeature = new ol.Feature({
+                            geometry: new ol.geom.Point (result["features"][i]["geometry"]["coordinates"]),
+                            name: result["features"][i]["properties"]["name"],
+                        })
+                        let tmpstyle = new ol.style.Style ({
+                                //文本样式
+                                text: new ol.style.Text ({
+                                    textAlign: 'center',     //对齐方式
+                                    textBaseline: 'middle',    //文本基线
+                                    font: 'normal 12px 微软雅黑',     //字体样式
+                                    text: tmpfeature.get('name'),    //文本内容
+                                    offsetY: -15,    // Y轴偏置
+                                    fill: new ol.style.Fill ({        //填充样式
+                                        color: '#33488c'
+                                    }),
+                                    padding: [2, 5, 2, 5],
+                                }),
+                            })
+                        tmpfeature.setStyle(tmpstyle)
+                        labelsource.addFeature(tmpfeature)
+                    }
+                    labellayer = new ol.layer.Vector({
+                        name: "景点注记",
+                        source: labelsource,
+                    })
+                    map.addLayer(labellayer);
+            },
+            error: function () {
+                alert ("服务器异常，有人要扣工资了！");
+            }
+        });
+    }
+
+    function ClearQuery(){
+        map.removeLayer(vectorlayer);
+        vectorlayer = null;
+        map.removeLayer(labellayer);
+        labellayer = null;
+        $("#inputtext").val("");
+    }
+    </script>
 {% endblock %}

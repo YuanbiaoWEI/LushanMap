@@ -30,7 +30,7 @@
             source: sourceOfDrawingObject,
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
-                    color: 'rgba(255, 255, 255, 0.5)'
+                    color: 'rgba(255,255,255,0.25)'
                 }),
                 stroke: new ol.style.Stroke({
                     color: '#00a5b4',
@@ -49,6 +49,7 @@
         //搜索结果的图层和要素
         var vectorfeatures =null;
         var vectorlayer =null;
+        var labellayer = null;
         //根据绘制类型进行交互绘制图形处理
         function addInteraction() {
             //绘制类型
@@ -156,7 +157,7 @@
                 data: JSON.stringify({'BoundGeojson':areapolygon.getCoordinates()}),
                   success: function (result) {
                     console.log(result)
-                      if(result['geometry']["coordinates"].length === 0){
+                      if(result["features"].length === 0){
                             alert("抱歉！该区域内没有景点...");
                             ClearQuery();
                             return;
@@ -167,71 +168,68 @@
                             features: vectorfeatures,
                             wrapX: false
                         });
-                        console.log(vectorSource.getProjection())
+                        console.log(vectorfeatures)
                         vectorlayer = new ol.layer.Vector({
                             name: "景点查询结果",
                             source: vectorSource,
                             style: new ol.style.Style({
-                                    image: new ol.style.Circle({
+                                //图标样式
+                                image: new ol.style.Circle({
                                     radius: 5,//半径
                                     fill: new ol.style.Fill({//填充样式
-                                    color: '#2459ff',
-                                    }),
-                                stroke: new ol.style.Stroke({//边界样式
-                                    color: '#555555',
-                                    width: 1
-                                    })
-                                })
+                                        color: '#33488c',
+                                        }),
+                                    stroke: new ol.style.Stroke({//边界样式
+                                        color: '#ffffff',
+                                        width: 1
+                                        }),
+                                }),
                             })
                         });
                         map.addLayer(vectorlayer);
 
+                        var labelsource = new ol.source.Vector();
+                        for(i=0; i<result["features"].length;i++){
+                            let tmpfeature = new ol.Feature({
+                                geometry: new ol.geom.Point (result["features"][i]["geometry"]["coordinates"]),
+                                name: result["features"][i]["properties"]["name"],
+                            })
+                            let tmpstyle = new ol.style.Style ({
+                                    //文本样式
+                                    text: new ol.style.Text ({
+                                        textAlign: 'center',     //对齐方式
+                                        textBaseline: 'middle',    //文本基线
+                                        font: 'normal 12px 微软雅黑',     //字体样式
+                                        text: tmpfeature.get('name'),    //文本内容
+                                        offsetY: -15,    // Y轴偏置
+                                        fill: new ol.style.Fill ({        //填充样式
+                                            color: '#33488c'
+                                        }),
+                                        padding: [2, 5, 2, 5],
+                                    }),
+                                })
+                            tmpfeature.setStyle(tmpstyle)
+                            labelsource.addFeature(tmpfeature)
+                        }
+                        labellayer = new ol.layer.Vector({
+                            name: "景点注记",
+                            source: labelsource,
+                        })
+                        map.addLayer(labellayer);
                   },
                 error : function() {
                   alert("服务器异常，有人要扣工资了！");
                 }
               });
-
-                /*
-                var dataurl = "http://localhost:8090/iserver/services/data-ChengduFresh/rest/data";
-                var getFeatureParams = new SuperMap.GetFeaturesByGeometryParameters({
-                    datasetNames: ["ChengduFresh:Shop"],
-                    geometry: areapolygon,
-                    spatialQueryMode: "INTERSECT",
-                    toIndex:200
-                });
             }
-            new ol.supermap.FeatureService(dataurl).getFeaturesByGeometry(getFeatureParams, function (serviceResult) {
-                if(serviceResult.result.features.features.length === 0){
-                    alert("抱歉！该区域内没有店铺...");
-                    ClearQuery();
-                    return;
-                }
-                vectorfeature = (new ol.format.GeoJSON()).readFeatures(serviceResult.result.features);
-                var vectorSource = new ol.source.Vector({
-                    features: vectorfeature,
-                    wrapX: false
-                });
-                vectorlayer = new ol.layer.Vector({
-                    name: "点矢量图层",
-                    source: vectorSource,
-                    style: new ol.style.Style({
-                        image: new ol.style.Icon(({
-                            anchor: [0.5, 0.9],
-                            src: '../img/locator/greenIcon.png'
-                        }))
-                    })
-                });
-                map.addLayer(vectorlayer);
-
-                 */}
-            //});
         }
 
         function ClearQuery(){
             map.removeLayer(vectorlayer);
             vectorlayer = null;
             vectorfeatures = null;
+            map.removeLayer(labellayer);
+            labellayer = null;
             //overlay.setPosition(undefined);
             //map.removeOverlay(overlay);
             //map.un("click",clickListener);
