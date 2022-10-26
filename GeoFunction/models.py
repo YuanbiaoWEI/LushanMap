@@ -27,3 +27,7 @@ def SQLQueryByBound(BoundGeoJson):
 def SQLQueryByName(name):
     SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point where name like ' + name + ';'
     return SQL
+
+def SQLAllPoint():
+    SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point;'
+    return SQL

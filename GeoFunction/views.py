@@ -58,3 +58,26 @@ def querybyname(request):
         }
         FeatureCollection["features"].append(feature)
     return JsonResponse(FeatureCollection)
+
+@csrf_exempt
+@login_required
+def heatmap(request):
+    SQL = models.SQLAllPoint()
+    response = models.execSQL(SQL)
+    FeatureCollection = {
+        "type": "FeatureCollection",
+        "features": []
+    }
+    for eachpoint in response:
+        feature = {
+            "type": "Feature",
+            "properties": {
+                "name": eachpoint['name']
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [eachpoint['x'], eachpoint['y']]
+            }
+        }
+        FeatureCollection["features"].append(feature)
+    return JsonResponse(FeatureCollection)

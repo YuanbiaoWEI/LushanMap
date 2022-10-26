@@ -1,0 +1,27 @@
+{% extends "Map/LushanMap.html" %}
+{% load static %}
+
+{%  block function_js %}
+<script>
+    $.ajax ("/GeoFunction/HeatMap/",
+        {
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                vectorfeatures = (new ol.format.GeoJSON()).readFeatures(result);
+                var heatMap = new ol.layer.Heatmap({
+                        source: new ol.source.Vector({
+                        features: vectorfeatures,
+                        wrapX: false
+                          }),
+                          blur: 40,
+                          radius: 25
+                    });
+                map.addLayer(heatMap);
+            },
+            error: function () {
+                alert ("服务器异常，有人要扣工资了！");
+            }
+    });
+</script>
+{% endblock %}

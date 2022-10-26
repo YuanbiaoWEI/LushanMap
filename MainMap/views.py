@@ -20,3 +20,7 @@ def querybybound(request):
 @login_required
 def querybyname(request):
     return render(request, "Map/QueryByName.html")
+
+@login_required
+def heatmap(request):
+    return render(request, "Map/HeatMap.html")
