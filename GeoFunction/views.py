@@ -127,6 +127,9 @@ def mytrajectory(request):
 def uploadtrajectory(request):
     response = {}
 
+    #获取坐标系
+    coordinate = request.POST.get('coordinate-system')
+
     # 解析前端传来的数据流文件
     fileStream = request.FILES['UserTrajectory']
     fileData = json.loads(fileStream.file.read().decode())
@@ -152,7 +155,10 @@ def uploadtrajectory(request):
         return render(request,'Map/UploadTrajectory.html', response)
 
     # 将合法数据保存至数据库
-
+    username = request.user.username
+    for geom in geometries:
+        SQL = models.UpdateTrajectory(geom,username)
+        models.updateSQL(SQL)
 
     # 给前端提交反馈
     if features:

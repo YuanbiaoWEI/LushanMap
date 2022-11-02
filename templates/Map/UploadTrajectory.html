@@ -8,7 +8,7 @@
     <div class="container">
     <div class="col-md-8">
         <h3>选择上传的轨迹数据</h3>
-        <span>一次只能上传一个矢量文件，支持的文件格式：geojson</span>
+        <span>一次只能上传一个矢量文件，支持的文件格式：geojson (LineString or MultiLineString)</span>
     <form id="upload_form" method="post" action="/GeoFunction/UploadTrajectory/" enctype="multipart/form-data" style="margin-top: 10px">
         <!-- COMPONENT START -->
         <div class="form-group">
@@ -20,7 +20,14 @@
             </div>
         </div>
         <!-- COMPONENT END -->
-        <div class="form-group">
+        <!-- No need to choose the coordinate system, it will be forced to transform to 3857.
+        <select name="coordinate-system" class="form-control input-sm" required>
+                <option disabled selected value>- 请选择坐标系</option>
+                <option value="4326">WGS84-4326</option>
+                <option value="3857">PseudoMercator-3857</option>
+        </select>
+        -->
+        <div class="form-group" style="margin-top: 10px">
             <button type="submit" id="submit" class="btn btn-primary pull-right" disabled>提交</button>
             <button type="reset" class="btn btn-danger">重置</button>
         </div>

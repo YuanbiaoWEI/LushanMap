@@ -1,5 +1,6 @@
 from django.db import models
 import json
+import datetime
 from django.db import connection
 
 # Create your models here.
@@ -19,17 +20,32 @@ def execSQL(SQL):
         result = dictfetchall(cursor)
     return result
 
+def updateSQL(SQL):
+    with connection.cursor() as cursor:
+        cursor.execute(SQL)
+
 def SQLQueryByBound(BoundGeoJson):
     #print("BoundGeoJson:",BoundGeoJson)
-    SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point where ST_Contains( ST_Transform( ST_SetSRID( ST_GeomFromGeojson(\'{"type":"Polygon","coordinates":' + json.dumps(BoundGeoJson) + '}\'),3857), 4326), nature_point.geom) = true'
+    SQL = """select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y 
+             from nature_point 
+             where ST_Contains( 
+                        ST_Transform( 
+                            ST_SetSRID( 
+                                ST_GeomFromGeojson('{"type":"Polygon","coordinates":""" \
+                                        + json.dumps(BoundGeoJson) + """}')
+                                    ,3857)
+                                , 4326)
+                            , nature_point.geom) = true"""
     return SQL
 
 def SQLQueryByName(name):
-    SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point where name like ' + name + ';'
+    SQL = """select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y 
+             from nature_point 
+             where name like """ + name + """;"""
     return SQL
 
 def SQLAllPoint():
-    SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point;'
+    SQL = """select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point;"""
     return SQL
 
 def SQLServiceArea():
@@ -38,4 +54,22 @@ def SQLServiceArea():
 
 def SQLSearchTrajectoryByUsername(name):
     SQL = "select ST_AsGeoJSON(geom) as trajectory from trajectory where owner like '"+name+"';"
+    return SQL
+
+def UpdateTrajectory(geometry, username):
+    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    SQL = """insert into trajectory (owner,time,length,geom) values ('"""+ username +"""','"""+ today +"""',
+            ST_Length(
+                ST_Force2D(
+                    ST_GeomFromGeoJSON('"""+ json.dumps(geometry) +"""')
+                )
+            )
+            ,
+            st_transform(
+                ST_Force2D(
+                    ST_Multi(
+                        ST_GeomFromGeoJSON('"""+ json.dumps(geometry) +"""')
+                    )
+                )
+            ,3857))"""
     return SQL
