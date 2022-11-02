@@ -31,3 +31,11 @@ def SQLQueryByName(name):
 def SQLAllPoint():
     SQL = 'select name,ST_X(ST_Transform(geom,3857)) as x,ST_Y(ST_Transform(geom,3857)) as y from nature_point;'
     return SQL
+
+def SQLServiceArea():
+    SQL = 'select ST_AsGeoJSON(geom) from servicearea;'
+    return SQL
+
+def SQLSearchTrajectoryByUsername(name):
+    SQL = "select ST_AsGeoJSON(geom) as trajectory from trajectory where owner like '"+name+"';"
+    return SQL

@@ -18,6 +18,15 @@
                           radius: 25
                     });
                 map.addLayer(heatMap);
+                map.on("moveend",function(e){
+                    var zoom = map.getView().getZoom();  //获取当前地图的缩放级别
+                    if(zoom <= 11) {
+                        heatMap.setVisible(false);
+                    }
+                    else{
+                        heatMap.setVisible(true);
+                    }
+                });
             },
             error: function () {
                 alert ("服务器异常，有人要扣工资了！");

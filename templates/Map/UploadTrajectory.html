@@ -1,0 +1,70 @@
+{% extends "Map/Map.html" %}
+{% load static %}
+
+{% block content %}
+    <link type="text/css" rel="stylesheet" href=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css />
+    <link type="text/css" rel="stylesheet" href=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css />
+
+    <div class="container">
+    <div class="col-md-8">
+        <h3>选择上传的轨迹数据</h3>
+        <span>一次只能上传一个矢量文件，支持的文件格式：geojson</span>
+    <form id="upload_form" method="post" action="/GeoFunction/UploadTrajectory/" enctype="multipart/form-data" style="margin-top: 10px">
+        <!-- COMPONENT START -->
+        <div class="form-group">
+            <div class="input-group input-file" name="UserTrajectory">
+                <input type="text" class="form-control" placeholder='选择一个文件...' />
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-choose" type="button">选择</button>
+                </span>
+            </div>
+        </div>
+        <!-- COMPONENT END -->
+        <div class="form-group">
+            <button type="submit" id="submit" class="btn btn-primary pull-right" disabled>提交</button>
+            <button type="reset" class="btn btn-danger">重置</button>
+        </div>
+        <div>{{ detail }}</div>
+        <img src="https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif"/>
+    </form>
+    </div>
+    </div>
+    <script>
+        function bs_input_file() {
+        $(".input-file").before(
+            function() {
+                if ( ! $(this).prev().hasClass('input-ghost') ) {
+                    var element = $("<input type='file' class='input-ghost' style='visibility:hidden; height:0'>");
+                    element.attr("name",$(this).attr("name"));
+                    element.change(function(){
+                        if((element.val()).split('.').pop() !== 'geojson') {
+                            alert ("不支持改文件格式！");
+                            $(this).find("button.btn-reset").click();
+                        }
+                        else {
+                            element.next (element).find ('input').val ((element.val ()).split ('\\').pop ());
+                            $("#submit").removeAttr('disabled');
+                        }
+                    });
+                    $(this).find("button.btn-choose").click(function(){
+                        element.click();
+                    });
+                    $(this).find("button.btn-reset").click(function(){
+                        element.val(null);
+                        $(this).parents(".input-file").find('input').val('');
+                    });
+                    $(this).find('input').css("cursor","pointer");
+                    $(this).find('input').mousedown(function() {
+                        $(this).parents('.input-file').prev().click();
+                        return false;
+                    });
+                    return element;
+                }
+            }
+        );
+    }
+    $(function() {
+        bs_input_file();
+    });
+    </script>
+{% endblock %}

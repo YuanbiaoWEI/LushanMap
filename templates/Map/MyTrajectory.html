@@ -1,0 +1,50 @@
+{% extends "Map/LushanMap.html" %}
+{% load static %}
+
+{%  block function_js %}
+<script>
+    $.ajax ("/GeoFunction/MyTrajectory/",
+        {
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                vectorfeatures = (new ol.format.GeoJSON()).readFeatures(result);
+                var MyTrajectory = new ol.layer.Vector({
+                    name: "轨迹查询结果",
+                    source: new ol.source.Vector({
+                        features: vectorfeatures,
+                        wrapX: false
+                          }),
+                    style: new ol.style.Style({
+                        fill: new ol.style.Fill({
+                            color: 'rgba(203,253,255,0.24)'
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: '#00a5b4',
+                            width: 2
+                        }),
+                        image: new ol.style.Circle({
+                            radius: 7,
+                            fill: new ol.style.Fill({
+                                color: '#00a5b4'
+                            })
+                        })
+                    })
+                });
+                map.addLayer(MyTrajectory);
+                map.on("moveend",function(e){
+                    var zoom = map.getView().getZoom();  //获取当前地图的缩放级别
+                    if(zoom <= 11) {
+                        MyTrajectory.setVisible(false);
+                    }
+                    else{
+                        MyTrajectory.setVisible(true);
+                    }
+                });
+            },
+            error: function () {
+                alert ("服务器异常，有人要扣工资了！");
+            }
+    });
+</script>
+{% endblock %}

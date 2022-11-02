@@ -24,3 +24,15 @@ def querybyname(request):
 @login_required
 def heatmap(request):
     return render(request, "Map/HeatMap.html")
+
+@login_required
+def servicearea(request):
+    return render(request, "Map/ServiceArea.html")
+
+@login_required
+def mytrajectory(request):
+    return render(request, "Map/MyTrajectory.html")
+
+@login_required
+def uploadtrajectory(request):
+    return render(request, "Map/UploadTrajectory.html")
