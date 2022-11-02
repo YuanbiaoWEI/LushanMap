@@ -51,25 +51,3 @@ def SQLAllPoint():
 def SQLServiceArea():
     SQL = 'select ST_AsGeoJSON(geom) from servicearea;'
     return SQL
-
-def SQLSearchTrajectoryByUsername(name):
-    SQL = "select ST_AsGeoJSON(geom) as trajectory from trajectory where owner like '"+name+"';"
-    return SQL
-
-def UpdateTrajectory(geometry, username):
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
-    SQL = """insert into trajectory (owner,time,length,geom) values ('"""+ username +"""','"""+ today +"""',
-            ST_Length(
-                ST_Force2D(
-                    ST_GeomFromGeoJSON('"""+ json.dumps(geometry) +"""')
-                )
-            )
-            ,
-            st_transform(
-                ST_Force2D(
-                    ST_Multi(
-                        ST_GeomFromGeoJSON('"""+ json.dumps(geometry) +"""')
-                    )
-                )
-            ,3857))"""
-    return SQL

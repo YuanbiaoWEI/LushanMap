@@ -31,8 +31,8 @@ def servicearea(request):
 
 @login_required
 def mytrajectory(request):
-    return render(request, "Map/MyTrajectory.html")
+    return render(request, "Trajectory/MyTrajectory.html")
 
 @login_required
 def uploadtrajectory(request):
-    return render(request, "Map/UploadTrajectory.html")
+    return render(request, "Trajectory/UploadTrajectory.html")

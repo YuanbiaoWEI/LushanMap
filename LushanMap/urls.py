@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include(('MainMap.urls', 'MainMap'))),
     path('UserManage/', include(('UserManage.urls', 'UserManage'))),
     path('GeoFunction/', include(('GeoFunction.urls', 'GeoFunction'))),
+    path('TrajectoryManage/', include(('TrajectoryManage.urls', 'TrajectoryManage'))),
 ]
