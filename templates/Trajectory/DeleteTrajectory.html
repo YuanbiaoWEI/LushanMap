@@ -1,0 +1,54 @@
+{% extends "Map/Map.html" %}
+{% load static %}
+
+{% block content %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="//bootswatch.com/cosmo/bootstrap.min.css" rel="stylesheet">
+    <h3 style="margin-left: 30px">请选择你需要删除的轨迹</h3>
+    <ul class="list-group" style="margin: 20px; width: 60%">
+    {% for each in trajectorylist %}
+      <li class="list-group-item">
+        <h4>
+            <input type="checkbox" name="trajectory" id="{{ each.gid }}">
+                &nbsp;{{ each.name }}
+            <span class="badge pull-right">上传时间：{{ each.time }}</span>
+            <span class="pull-right">&nbsp;&nbsp;</span>
+            <span class="badge pull-right">轨迹长度：{{ each.length }}</span>
+        </h4>
+      </li>
+    {% endfor %}
+    </ul>
+    <button type="button" id="submit" class="btn btn-danger" style="margin: 20px">确认删除</button>
+    <script>
+    var selectedid = [];
+    var groupCheckbox=$("input[name='trajectory']");
+    $("#submit").click(function(){
+        for(i=0;i<groupCheckbox.length;i++) {
+            if (groupCheckbox[i].checked) {
+                selectedid.push (Number(groupCheckbox[i].id))
+            }
+        }
+
+        if(selectedid.length === 0)
+            alert("没有需要删除的轨迹");
+        else{
+            var r = confirm("确认要删除这些轨迹吗？")
+            if(r){
+                $.ajax("/TrajectoryManage/DeleteTrajectory/", {
+                    type: "POST",
+                    dataType: "json",
+                    data: JSON.stringify ({'selectedid': selectedid}),
+                    success: function (result) {
+                        alert("删除成功！")
+                        $(location).attr('href','/DeleteTrajectory')
+                    },
+                    error: function () {
+                        alert ("服务器异常，有人要扣工资了！");
+                    }
+                })
+            }
+        }
+    })
+
+    </script>
+{% endblock %}

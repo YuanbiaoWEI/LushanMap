@@ -9,5 +9,6 @@ urlpatterns = [
     path('ServiceArea/', views.servicearea, name = 'servicearea'),
     path('MyTrajectory/', views.mytrajectory, name = 'mytrajectory'),
     path('UploadTrajectory/', views.uploadtrajectory, name = 'uploadtrajectory'),
+    path('DeleteTrajectory/', views.deletetrajectory, name = 'deletetrajectory'),
     path('', views.login_page, name ='login_page'),
 ]

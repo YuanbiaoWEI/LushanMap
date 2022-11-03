@@ -3,6 +3,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from MainMap import models
+
+
 # Create your views here.
 def mainpage(request):
     context = {'user': request.user }
@@ -36,3 +39,16 @@ def mytrajectory(request):
 @login_required
 def uploadtrajectory(request):
     return render(request, "Trajectory/UploadTrajectory.html")
+
+@login_required
+def deletetrajectory(request):
+    trajectorylist = []
+    SQL = models.SQLSearchTrajectoryByUsername(request.user.username)
+    result = models.execSQL(SQL)
+    for eachtrajectory in result:
+        trajectorylist.append(eachtrajectory)
+    context = {
+        'trajectorylist':trajectorylist
+    }
+
+    return render(request, "Trajectory/DeleteTrajectory.html",context)
