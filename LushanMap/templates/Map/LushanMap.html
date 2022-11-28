@@ -1,0 +1,134 @@
+{% extends "Map/Map.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href={% static 'css/lushanmap.css' %}>
+ <div id="mapCon" class="mapCon">
+    {%  block function_html %}{% endblock %}
+    <div id="coordinates" style="z-index: 2;">
+            <label>经纬度：</label>
+        </div>
+        <div id="north" style="z-index: 2;">
+            <img src={% static 'img/north.png' %} style="z-index: 2;"></img>
+        </div>
+    <div id="LayerRadio">
+        图层:
+        <input type="radio" name="layer" value="vec" checked />线划图
+        <input type="radio" name="layer" value="img" />卫星图
+    </div>
+ </div>
+ <script type="text/javascript">
+     /* 创建地图 */
+     var centerpoint = [12912725.9,3445265.6];
+     var lushanbound = [12897211,3437389,12922494,3455421];
+
+     var map = new ol.Map({
+         target: "mapCon",
+         view: new ol.View({
+             projection: 'EPSG:3857',
+             center: centerpoint,
+             zoom: 12,
+             minZoom: 5,
+             maxZoom:18,
+         }),
+         controls:
+            ol.control.defaults({
+                attributionOptions: ({
+                    collapsible: true
+                })
+              }).extend([
+                  new ol.control.ZoomToExtent({
+                      extent: lushanbound
+                  }),
+                new ol.control.MousePosition({
+                    coordinateFormat: ol.coordinate.createStringXY(5),
+                    projection:'EPSG:4326',
+                    placeholder: true,
+                    target:"coordinates"
+                }),
+                ])
+     });
+
+     var LushanContour= new ol.layer.Image({
+         name: "LuShanMap",
+         opacity: 0.5,
+         source: new ol.source.ImageWMS({
+             url: '{{ GEOSERVER_URL }}LuShan/wms',
+             params: {
+                 'VERSION': '1.1.1',
+                 "LAYERS": 'LuShan:contour50m2',
+             }
+         })
+     });
+
+     var LushanMap= new ol.layer.Image({
+         name: "LuShanMap",
+         opacity: 0.5,
+         source: new ol.source.ImageWMS({
+             url: '{{ GEOSERVER_URL }}geoserver/LuShan/wms',
+             params: {
+                 'VERSION': '1.1.1',
+                 "LAYERS": 'LuShan:LuShanMap',
+             }
+         })
+     });
+
+     var TiandiMap_vec = new ol.layer.Tile ({
+         name: "天地图矢量图层",
+         source: new ol.source.XYZ ({
+             url: "http://t0.tianditu.com/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=3bc6874f2b919aa581635abab7759a3f",
+             wrapX: false
+         })
+     });
+     var TiandiMap_cva = new ol.layer.Tile ({
+         name: "注记图层",
+         source: new ol.source.XYZ ({
+             url: "http://t0.tianditu.com/DataServer?T=cva_w&x={x}&y={y}&l={z}&tk=3bc6874f2b919aa581635abab7759a3f",
+             wrapX: false
+         })
+     });
+       var TiandiMap_img = new ol.layer.Tile({
+      name: "影像图层",
+      source: new ol.source.XYZ({
+          url: "http://t0.tianditu.com/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=3bc6874f2b919aa581635abab7759a3f",
+          wrapX: false
+          })
+      });
+     map.addLayer (TiandiMap_img);
+     map.addLayer (TiandiMap_vec);
+     //map.addLayer (LushanMap);
+     map.addLayer (LushanContour);
+     map.addLayer (TiandiMap_cva);
+     TiandiMap_img.setVisible(false);
+
+     //实例化ZoomSlider控件并加载到地图容器中
+    var zoomslider = new ol.control.ZoomSlider();
+    map.addControl(zoomslider);
+    map.addControl(new ol.control.ScaleLine())
+
+     $("input:radio[name='layer']").change(function (){
+            if( $(this).val() == 'img' ){
+                TiandiMap_img.setVisible(true);
+                TiandiMap_vec.setVisible(false);
+            }
+            if( $(this).val() == 'vec' ){
+                TiandiMap_img.setVisible(false);
+                TiandiMap_vec.setVisible(true);
+            }
+        });
+
+    map.on("moveend",function(e){
+        var zoom = map.getView().getZoom();  //获取当前地图的缩放级别
+        if(zoom <= 11) {
+            LushanContour.setVisible(false);
+            LushanMap.setVisible(false);
+        }
+        else{
+            LushanContour.setVisible(true);
+            LushanMap.setVisible(true);
+        }
+    });
+
+ </script>
+
+    {%  block function_js %}{% endblock %}
+{% endblock %}
